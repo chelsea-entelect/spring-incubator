@@ -1,11 +1,9 @@
 package entelect.training.incubator.spring.booking.api;
 
-import entelect.training.incubator.spring.customer.model.Customer;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
-import entelect.training.incubator.spring.flight.model.Flight;
 
 @Component
 public class FlightApiClient {
@@ -14,11 +12,11 @@ public class FlightApiClient {
 
 
     @GetMapping("/{id}")
-    public Flight getFlightsById(String flightId) {
-        return webClient.get()
+    public void verifyFlightExists(String flightId) {
+         webClient.get()
                 .uri("/flights/{id}", flightId)
                 .retrieve()
-                .bodyToMono(Flight.class).block();
+                .toBodilessEntity().block();
     }
 
 }

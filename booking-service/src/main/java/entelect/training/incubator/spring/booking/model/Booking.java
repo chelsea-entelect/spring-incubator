@@ -22,4 +22,10 @@ public class Booking {
 
     private String referenceNumber;
 
+    public Booking(String customerId, String flightId, String referenceNumber ){
+        this.customerId = customerId;
+        this.flightId = flightId;
+        this.referenceNumber = referenceNumber;
+    }
+
 }

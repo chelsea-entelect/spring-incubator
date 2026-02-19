@@ -14,4 +14,9 @@ public class BookingRequest {
     private String customerId;
 
     private String flightId;
+
+    public BookingRequest(String customerId, String flightId){
+        this.customerId = customerId;
+        this.flightId= flightId;
+    }
 }
