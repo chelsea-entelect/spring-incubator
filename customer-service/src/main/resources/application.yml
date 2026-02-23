@@ -14,3 +14,7 @@ server:
   port: 8201
   error:
     include-message: always
+
+logging:
+  level:
+    root: INFO

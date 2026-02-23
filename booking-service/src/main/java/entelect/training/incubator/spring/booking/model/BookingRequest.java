@@ -1,14 +1,12 @@
 package entelect.training.incubator.spring.booking.model;
 
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+
 import lombok.Data;
+import org.springframework.data.annotation.Id;
 
 @Data
 public class BookingRequest {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     private String customerId;
