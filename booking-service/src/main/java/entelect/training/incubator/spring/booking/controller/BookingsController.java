@@ -1,7 +1,5 @@
 package entelect.training.incubator.spring.booking.controller;
 
-import entelect.training.incubator.spring.booking.api.CustomerApiClient;
-import entelect.training.incubator.spring.booking.api.FlightApiClient;
 import entelect.training.incubator.spring.booking.model.Booking;
 import entelect.training.incubator.spring.booking.model.BookingCustomerIdRequest;
 import entelect.training.incubator.spring.booking.model.BookingRequest;
@@ -14,22 +12,16 @@ import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.util.UUID;
-
 @RestController
 @RequestMapping("bookings")
 public class BookingsController {
     private final Logger LOGGER = LoggerFactory.getLogger(BookingsController.class);
 
-    CustomerApiClient customerApiClient;
-    FlightApiClient flightApiClient;
+
     BookingsService bookingsService;
 
-    public BookingsController(CustomerApiClient customerApiClient,
-                              FlightApiClient flightApiClient,
-                              BookingsService bookingsService) {
-        this.customerApiClient = customerApiClient;
-        this.flightApiClient = flightApiClient;
+    public BookingsController(
+            BookingsService bookingsService) {
         this.bookingsService = bookingsService;
     }
 
@@ -37,23 +29,15 @@ public class BookingsController {
     public Mono<ResponseEntity<Booking>> createBooking(
             @RequestBody BookingRequest bookingRequest) {
 
-        return customerApiClient.verifyCustomerExists(bookingRequest.getCustomerId())
-                .then(flightApiClient.verifyFlightExists(bookingRequest.getFlightId()))
-                .then(
-                        bookingsService.createBooking(
-                                new Booking(
-                                        bookingRequest.getCustomerId(),
-                                        bookingRequest.getFlightId(),
-                                        UUID.randomUUID().toString()
-                                )
-                        )
-                )
-                .map(savedBooking ->
+        return bookingsService
+                .createBooking(bookingRequest)
+                .map(saved ->
                         ResponseEntity
                                 .status(HttpStatus.CREATED)
-                                .body(savedBooking)
+                                .body(saved)
                 );
     }
+
 
     @GetMapping("/{id}")
     public Mono<Booking> getBookingById(@PathVariable Integer id){

@@ -1,6 +1,0 @@
-version: "3.8"
-services:
-  rewards:
-    image: rewards-service:latest
-    ports:
-      - "8085:8080"

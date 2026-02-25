@@ -3,6 +3,7 @@ package controller;
 import entelect.training.incubator.spring.booking.BookingsServiceApplication;
 import entelect.training.incubator.spring.booking.api.CustomerApiClient;
 import entelect.training.incubator.spring.booking.api.FlightApiClient;
+import entelect.training.incubator.spring.booking.api.RewardsApiClient;
 import entelect.training.incubator.spring.booking.config.SecurityConfig;
 import entelect.training.incubator.spring.booking.error.CustomerNotFoundException;
 import entelect.training.incubator.spring.booking.model.Booking;
@@ -18,6 +19,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Mono;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
@@ -46,6 +48,8 @@ class BookingsRestControllerIntegrationTest {
     private FlightApiClient flightApiClient;
     @MockBean
     private CustomerApiClient customerApClient;
+    @MockBean
+    private RewardsApiClient rewardsApiClient;
 
     @AfterEach
     void resetDb() {
@@ -63,7 +67,7 @@ class BookingsRestControllerIntegrationTest {
         // mock external service calls
         when(customerApClient.verifyCustomerExists(customerId)).thenReturn(Mono.empty());
         when(flightApiClient.verifyFlightExists(flightId)).thenReturn(Mono.empty());
-
+        when(rewardsApiClient.captureRewards(customerId, BigDecimal.ONE)).thenReturn(Mono.empty());
         // when
         webTestClient
                 .post().uri("/bookings")

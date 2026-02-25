@@ -121,11 +121,7 @@
             <artifactId>jaxb-runtime</artifactId>
             <version>4.0.5</version>
         </dependency>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <scope>test</scope>
-        </dependency>
+
         <dependency>
             <groupId>jakarta.xml.ws</groupId>
             <artifactId>jakarta.xml.ws-api</artifactId>
@@ -141,6 +137,7 @@
             <artifactId>testcontainers</artifactId>
             <scope>test</scope>
         </dependency>
+
 
     </dependencies>
     <build>
@@ -165,6 +162,10 @@
                     <sourceDestDir>${project.build.directory}/generated-sources/wsimport</sourceDestDir>
                     <keep>true</keep>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
             </plugin>
         </plugins>
     </build>
