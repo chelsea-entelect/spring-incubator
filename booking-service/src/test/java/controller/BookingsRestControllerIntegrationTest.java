@@ -4,7 +4,6 @@ import entelect.training.incubator.spring.booking.BookingsServiceApplication;
 import entelect.training.incubator.spring.booking.api.CustomerApiClient;
 import entelect.training.incubator.spring.booking.api.FlightApiClient;
 import entelect.training.incubator.spring.booking.api.RewardsApiClient;
-import entelect.training.incubator.spring.booking.config.SecurityConfig;
 import entelect.training.incubator.spring.booking.error.CustomerNotFoundException;
 import entelect.training.incubator.spring.booking.model.Booking;
 import entelect.training.incubator.spring.booking.model.BookingRequest;
@@ -12,9 +11,9 @@ import entelect.training.incubator.spring.booking.repository.BookingsRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Mono;
@@ -27,14 +26,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatCode;
 import static org.assertj.core.api.AssertionsForClassTypes.tuple;
 import static org.mockito.Mockito.when;
+import static org.springframework.restdocs.webtestclient.WebTestClientRestDocumentation.document;
 
 @SpringBootTest(
         webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
-        classes = BookingsServiceApplication.class,
-        properties = {"spring.security.enabled=false",
-                "management.security.enabled=false"}
+        classes = BookingsServiceApplication.class
 )
-@Import(SecurityConfig.class)
+@AutoConfigureWebTestClient
+@org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs
 class BookingsRestControllerIntegrationTest {
 
     @Autowired
@@ -71,9 +70,12 @@ class BookingsRestControllerIntegrationTest {
         // when
         webTestClient
                 .post().uri("/bookings")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .bodyValue(request).exchange()
-                .expectStatus().isCreated();
+                .headers(headers -> headers.setBasicAuth("user", "password"))
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(request).exchange()
+                .expectStatus().isCreated()
+                .expectBody()
+                .consumeWith(document("bookings-create"));
 
         // then
         List<Booking> found =  bookingsRepository.findAll().collectList().block();
@@ -101,10 +103,13 @@ class BookingsRestControllerIntegrationTest {
         webTestClient
                 .post()
                 .uri("/bookings")
+                .headers(headers -> headers.setBasicAuth("user", "password"))
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(request)
                 .exchange()
-                .expectStatus().isNotFound();
+                .expectStatus().isNotFound()
+                .expectBody()
+                .consumeWith(document("bookings-create-invalid-flight"));
 
 
     }

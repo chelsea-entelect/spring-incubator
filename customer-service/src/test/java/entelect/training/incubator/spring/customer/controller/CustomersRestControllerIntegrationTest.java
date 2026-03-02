@@ -16,6 +16,7 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -24,6 +25,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.CoreMatchers.is;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -32,6 +34,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = CustomerServiceApplication.class)
 @AutoConfigureMockMvc(addFilters = false)
+@org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs
 @EnableAutoConfiguration(exclude = {SecurityAutoConfiguration.class})
 @AutoConfigureTestDatabase
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
@@ -58,7 +61,8 @@ class CustomersRestControllerIntegrationTest {
         Customer customer = new Customer();
         customer.setFirstName(TEST_CUSTOMER_FIRST_NAME);
 
-        mvc.perform(post("/customers").contentType(MediaType.APPLICATION_JSON).content(toJson(customer)));
+        mvc.perform(post("/customers").contentType(MediaType.APPLICATION_JSON).content(toJson(customer)))
+                .andDo(MockMvcRestDocumentation.document("customers-create"));
 
         List<Customer> found = (List<Customer>) repository.findAll();
         assertThat(found).extracting(Customer::getFirstName).containsOnly(TEST_CUSTOMER_FIRST_NAME);
